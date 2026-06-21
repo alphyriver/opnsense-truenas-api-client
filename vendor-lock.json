@@ -1,0 +1,46 @@
+{
+  "_comment": "Pinned, byte-exact provenance of the vendored Python packages under src/usr/local/lib/python3.13/site-packages. Verified to match the copies shipping on TrueNAS SCALE 25.10.4. scripts/vendor-update.sh re-vendors from these refs and checks the sha256 sums.",
+  "version": "25.10.4",
+  "python_site": "usr/local/lib/python3.13/site-packages",
+  "packages": {
+    "truenas_api_client": {
+      "repo": "https://github.com/truenas/api_client",
+      "ref": "release/25.10.4",
+      "commit": "8c59978c3bf6c4e38271363907ec46e9b7f10abf",
+      "subdir": "truenas_api_client",
+      "license": "LGPL-3.0",
+      "files": {
+        "__init__.py": "cd758299a7778543d7108de10c5c54821c4d5429e9427ad040602d8ca0aa9f8d",
+        "config.py": "7faec9e3eadc46bcead0e36e8bb3a52dcab90e5bef05b316e5c438517d73d985",
+        "ejson.py": "e92ee0a1f5a3ea9445e8ac4b50b42f99f00dccfc09a95cd80b94caea1f25ec15",
+        "exc.py": "a74eb70a1a5e240a4471e3f51a0ae61bcb2c1cf0819ad5668f455da43a63c809",
+        "jsonrpc.py": "6ecca47d339d4438413db09d92d7541bcf80a421ac9766a0c3ef16fa5bf2f553",
+        "legacy.py": "ec597f82a7992885ffa59fb36fa72be0d71ff216e3ca099ebc83d500b6eafd63",
+        "utils.py": "23dbd3c0fc73364bca179458a12c46e1a3d49daf5484ad9b8e3c94c0ace28ee5"
+      }
+    },
+    "websocket": {
+      "repo": "https://github.com/websocket-client/websocket-client",
+      "ref": "v1.8.0",
+      "subdir": "websocket",
+      "license": "Apache-2.0",
+      "exclude": ["tests"],
+      "files": {
+        "__init__.py": "1af5694cf923be16041997235eccd27ebb3615a547b9d51d1a0192a9ffd16f0e",
+        "_abnf.py": "59eb14252486491a73b93a7455e2b5d8ee1261854c37a0b237a6ea5d2e25936c",
+        "_app.py": "c4202568cd857ec3cbb1a12c0465e1760e289470c413389fea595259e7c7726f",
+        "_cookiejar.py": "f3ddd25a81e693f272b225e3f259322f2f79728e73bee0bad9718caef9a023b1",
+        "_core.py": "3fe95873093e2ca254283a8195e26c9914882635f6bffa381689e074961b867f",
+        "_exceptions.py": "afb946682f18d9bac19da2bf6092510dd618e940865b1397a10b0c720145789e",
+        "_handshake.py": "87ff3c4babe14ad399063e7330626d20a155d5154c56e12c90bc9b8c90a76a3e",
+        "_http.py": "df71acae85a02e13ac13ca4c0b65e46be463a273ee532a6378544004502d409a",
+        "_logging.py": "0c7454978b0469292896f328e00eaea67ed42181749094f936500bd2f5821d12",
+        "_socket.py": "369b1404ed628670bec4f034536a35fa13172bc7a2a6535c53d476559bd9dea5",
+        "_ssl_compat.py": "4913edc35ad3dcb3d297dabbd260a2e615bd876c52fa721f75c5db8f21a2f2c1",
+        "_url.py": "91b11d6dd67e04c328610dec31f729f50118d4862b0e9a48282a4820774654c7",
+        "_utils.py": "477e859c54f16152722a587ec8469aa51c69a0af17c27f491570b2daada1698d",
+        "_wsdump.py": "915f362d62e50fa777bf338a395004aa47e8080fd092977485cf563764eada43"
+      }
+    }
+  }
+}

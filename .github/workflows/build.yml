@@ -1,0 +1,91 @@
+name: 📦 Build & Test
+
+# GitHub is the canonical CI platform for this repo. This workflow runs fast
+# Python checks on the vendored client, then the authoritative FreeBSD package
+# build (matches OPNsense / FreeBSD 14.3).
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  PLUGIN_NAME: truenas-api-client
+  PLUGIN_CATEGORY: devel
+
+jobs:
+  # Vendored code is pure Python; verify it byte-matches vendor-lock.json and
+  # imports cleanly on the interpreter series OPNsense ships (3.13).
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Verify vendor-lock checksums
+        run: |
+          SP="src/usr/local/lib/python3.13/site-packages"
+          python3 - "$SP" <<'PY'
+          import hashlib, json, sys, pathlib
+          sp = pathlib.Path(sys.argv[1])
+          lock = json.load(open("vendor-lock.json"))
+          bad = 0
+          for pkg, meta in lock["packages"].items():
+              for fn, want in meta["files"].items():
+                  p = sp / pkg / fn
+                  got = hashlib.sha256(p.read_bytes()).hexdigest()
+                  if got != want:
+                      print(f"MISMATCH {pkg}/{fn}\n  want {want}\n  got  {got}")
+                      bad += 1
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: Byte-compile + import smoke test
+        run: |
+          SP="src/usr/local/lib/python3.13/site-packages"
+          python3 -m compileall -q "$SP"
+          PYTHONPATH="$SP" python3 -c "import truenas_api_client, websocket; from truenas_api_client import Client, main; print('import OK')"
+
+      - name: Lint shell scripts
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y shellcheck >/dev/null
+          shellcheck +POST_INSTALL +PRE_DEINSTALL scripts/*.sh || true
+
+  build:
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - name: Checkout opnsense/plugins (build root)
+        run: git clone --depth 1 https://github.com/opnsense/plugins.git ${GITHUB_WORKSPACE}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: ${{ env.PLUGIN_CATEGORY }}/${{ env.PLUGIN_NAME }}
+
+      - name: Build package in FreeBSD
+        uses: vmactions/freebsd-vm@v1
+        with:
+          envs: 'PLUGIN_NAME PLUGIN_CATEGORY'
+          usesh: true
+          release: "14.3"
+          prepare: |
+            mkdir -p /usr/local/etc/pkg/repos
+            echo 'FreeBSD-kmods: { enabled: no }' > /usr/local/etc/pkg/repos/FreeBSD-kmods.conf
+            pkg install -y git gmake
+          run: |
+            cd $PLUGIN_CATEGORY/$PLUGIN_NAME
+            make package
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: os-${{ env.PLUGIN_NAME }}
+          path: ${{ env.PLUGIN_CATEGORY }}/${{ env.PLUGIN_NAME }}/work/pkg/*.pkg
+          if-no-files-found: error

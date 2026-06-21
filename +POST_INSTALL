@@ -1,0 +1,14 @@
+#!/bin/sh
+# os-truenas-api-client: post-install
+#
+# The os-acme-client `truenas_ws` deploy hook calls `/usr/bin/env python`, but
+# OPNsense only ships `python3`. Provide a `python` -> python3 shim if (and only
+# if) one does not already exist, so we never clobber an operator-managed one.
+set -e
+
+if [ ! -e /usr/local/bin/python ]; then
+    ln -s python3 /usr/local/bin/python
+    echo "os-truenas-api-client: created /usr/local/bin/python -> python3"
+fi
+
+exit 0

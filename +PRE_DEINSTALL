@@ -1,0 +1,19 @@
+#!/bin/sh
+# os-truenas-api-client: pre-deinstall
+#
+# Remove the `python` shim we created in +POST_INSTALL, but only if it is still
+# a symlink pointing at python3 (i.e. ours). Never touch an operator's own
+# `python` binary or a differently-targeted link.
+set -e
+
+if [ -L /usr/local/bin/python ]; then
+    target=$(readlink /usr/local/bin/python)
+    case "$target" in
+        python3|python3.*|/usr/local/bin/python3|/usr/local/bin/python3.*)
+            rm -f /usr/local/bin/python
+            echo "os-truenas-api-client: removed /usr/local/bin/python shim"
+            ;;
+    esac
+fi
+
+exit 0

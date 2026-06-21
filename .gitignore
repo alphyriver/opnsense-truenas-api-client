@@ -1,0 +1,9 @@
+work/
+site/
+dist/
+signing.key
+*.pkg
+.DS_Store
+.vscode
+__pycache__/
+*.pyc

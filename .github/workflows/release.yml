@@ -1,0 +1,142 @@
+name: 🚀 Release
+
+# Cuts a release when a v* tag is pushed: builds the signed OPNsense package,
+# (re)generates the GitHub Pages pkg feed, and publishes a GitHub Release with
+# the .pkg attached.
+#
+# Required repository setup (one-time):
+#   - Secret  PKG_SIGNING_KEY : the RSA private key (PEM) whose public half is
+#                               committed at deploy/repo/truenas-api-client.pub.
+#   - Pages   Settings → Pages → Source: "Deploy from a branch" → gh-pages / root.
+
+on:
+  push:
+    tags: [ 'v*' ]
+  # Manual fallback: a release tag created by release-please with the default
+  # GITHUB_TOKEN does not auto-trigger this workflow. Run it by hand:
+  #   gh workflow run release.yml --ref vX.Y.Z
+  workflow_dispatch: {}
+
+permissions:
+  contents: write   # create the Release and push the gh-pages feed branch
+
+concurrency:
+  group: release-feed
+  cancel-in-progress: false
+
+env:
+  PLUGIN_NAME: truenas-api-client
+  PLUGIN_CATEGORY: devel
+  ABI: "FreeBSD:14:amd64"
+
+jobs:
+  release:
+    if: ${{ github.server_url == 'https://github.com' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout opnsense/plugins (build root)
+        run: git clone --depth 1 https://github.com/opnsense/plugins.git build
+
+      - name: Checkout plugin source
+        uses: actions/checkout@v4
+        with:
+          path: build/${{ env.PLUGIN_CATEGORY }}/${{ env.PLUGIN_NAME }}
+
+      - name: Checkout existing feed (gh-pages)
+        uses: actions/checkout@v4
+        continue-on-error: true   # absent on the very first release
+        with:
+          ref: gh-pages
+          path: site
+
+      - name: Verify tag matches plugin version
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          BASE="${TAG%%-*}"
+          MK=$(awk -F'=' '/^PLUGIN_VERSION/{v=$2; sub(/#.*/,"",v); gsub(/[ \t]/,"",v); print v}' \
+               "build/${PLUGIN_CATEGORY}/${PLUGIN_NAME}/Makefile")
+          echo "tag=$TAG base=$BASE makefile=$MK"
+          test "$BASE" = "$MK" || { echo "::error::tag v$TAG (base $BASE) != Makefile PLUGIN_VERSION $MK"; exit 1; }
+
+      - name: Stage signing key
+        env:
+          SIGNING_KEY: ${{ secrets.PKG_SIGNING_KEY }}
+        run: |
+          if [ -z "$SIGNING_KEY" ]; then echo "::error::PKG_SIGNING_KEY secret is not set"; exit 1; fi
+          umask 077
+          printf '%s\n' "$SIGNING_KEY" > signing.key
+
+      - name: Build package and sign the feed (FreeBSD)
+        uses: vmactions/freebsd-vm@v1
+        with:
+          envs: 'PLUGIN_NAME PLUGIN_CATEGORY ABI'
+          usesh: true
+          release: "14.3"
+          prepare: |
+            mkdir -p /usr/local/etc/pkg/repos
+            echo 'FreeBSD-kmods: { enabled: no }' > /usr/local/etc/pkg/repos/FreeBSD-kmods.conf
+            pkg install -y git gmake
+          run: |
+            set -e
+            WS=$(pwd)
+            mkdir -p "$WS/dist" "$WS/site/${ABI}"
+            cd "build/${PLUGIN_CATEGORY}/${PLUGIN_NAME}"
+            # PLUGIN_DEVEL= produces the clean "os-truenas-api-client" package
+            # (tier 3) rather than the "-devel" build.
+            make PLUGIN_DEVEL= package
+            PKG=$(ls work/pkg/os-${PLUGIN_NAME}-*.pkg | head -1)
+            cp "$PKG" "$WS/dist/"
+            cp "$PKG" "$WS/site/${ABI}/"
+            # Regenerate (and RSA-sign) the catalogue over every .pkg in the feed
+            # so older versions stay installable for upgrades.
+            pkg repo "$WS/site/${ABI}" "rsa:$WS/signing.key"
+
+      - name: Render feed metadata (conf, key, landing page)
+        run: |
+          rm -f signing.key
+          OWNER=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
+          REPO="${GITHUB_REPOSITORY#*/}"
+          PAGES_URL="https://${OWNER}.github.io/${REPO}"
+          REPO_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
+          VERSION="${GITHUB_REF_NAME#v}"
+          SRC="build/${PLUGIN_CATEGORY}/${PLUGIN_NAME}/deploy/repo"
+
+          sed "s#@PAGES_URL@#${PAGES_URL}#g" "${SRC}/${PLUGIN_NAME}.conf.in" > "site/${PLUGIN_NAME}.conf"
+          cp "${SRC}/${PLUGIN_NAME}.pub" site/pkg-repo.pub
+          KEY_SHA256=$(sha256sum site/pkg-repo.pub | cut -d' ' -f1)
+
+          sed -e "s#@PAGES_URL@#${PAGES_URL}#g" \
+              -e "s#@REPO_URL@#${REPO_URL}#g" \
+              -e "s#@REPO_SLUG@#${GITHUB_REPOSITORY}#g" \
+              -e "s#@VERSION@#${VERSION}#g" \
+              -e "s#@ABI@#${ABI}#g" \
+              -e "s#@KEY_SHA256@#${KEY_SHA256}#g" \
+              "${SRC}/index.html.in" > site/index.html
+          echo "feed contents:"; ls -R site | head -40
+
+      - name: Publish feed to GitHub Pages
+        if: ${{ !contains(github.ref_name, '-') }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          publish_branch: gh-pages
+          keep_files: false
+          commit_message: "release: ${{ github.ref_name }} feed update"
+
+      - name: Extract release notes from CHANGELOG
+        run: |
+          CL="build/${PLUGIN_CATEGORY}/${PLUGIN_NAME}/CHANGELOG.md"
+          if [ -f "$CL" ]; then
+            awk '/^## /{n++} n==1{print} n==2{exit}' "$CL" > release-notes.md
+          fi
+          [ -s release-notes.md ] || printf 'See CHANGELOG.md for details.\n' > release-notes.md
+          echo "---- release notes ----"; cat release-notes.md
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.pkg
+          body_path: release-notes.md
+          fail_on_unmatched_files: true
+          prerelease: ${{ contains(github.ref_name, '-') }}

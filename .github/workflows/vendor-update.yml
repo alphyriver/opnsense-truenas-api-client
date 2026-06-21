@@ -1,0 +1,57 @@
+name: 🔄 Vendor update (TrueNAS API client)
+
+# Tracks the vendored truenas_api_client + websocket-client against upstream.
+# Weekly, it re-runs scripts/vendor-update.sh; if a newer pinned release exists
+# it re-vendors the files and opens a PR for human review. It never merges
+# itself — a dependency that runs on a firewall warrants a human merge.
+#
+# To have CI run on the vendor PR automatically, set a VENDOR_UPDATE_TOKEN secret
+# (fine-grained PAT, contents + pull-requests write); otherwise re-run CI by hand.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'   # Mondays 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  vendor-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Re-vendor if upstream moved
+        id: vendor
+        run: |
+          sh scripts/vendor-update.sh
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "version=$(jq -r .version vendor-lock.json)" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open pull request
+        if: steps.vendor.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.VENDOR_UPDATE_TOKEN || github.token }}
+          VER: ${{ steps.vendor.outputs.version }}
+        run: |
+          set -eu
+          branch="vendor/tnac-${VER}"
+          git config user.name "vendor-bot"
+          git config user.email "vendor-bot@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add -A
+          git commit -m "chore(deps): re-vendor TrueNAS API client ${VER}"
+          git push origin "$branch"
+          gh pr create \
+            --base main --head "$branch" \
+            --title "chore(deps): re-vendor TrueNAS API client ${VER}" \
+            --body "Automated re-vendor to TrueNAS ${VER}.
+
+          Review the diff and confirm the \`vendor-lock.json\` checksums before merging. CI runs on this PR when a VENDOR_UPDATE_TOKEN PAT is configured (see workflow header)."

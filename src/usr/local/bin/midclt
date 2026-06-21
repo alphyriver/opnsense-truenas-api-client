@@ -1,0 +1,11 @@
+#!/usr/local/bin/python3
+# Console-script entry point for the vendored truenas_api_client package.
+# Mirrors the upstream `midclt = truenas_api_client:main` console script so the
+# os-acme-client `truenas_ws` deploy hook (which shells out to `midclt`) works
+# on OPNsense. See docs/ for provenance and pinned upstream versions.
+import sys
+
+from truenas_api_client import main
+
+if __name__ == "__main__":
+    sys.exit(main())

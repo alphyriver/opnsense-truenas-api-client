@@ -1,0 +1,10 @@
+TrueNAS WebSocket API client (midclt) for OPNsense.
+
+Vendors the pure-Python truenas_api_client (pinned to the TrueNAS 25.10.x
+build) and its websocket-client dependency, plus a `midclt` console wrapper,
+so the stock os-acme-client "truenas_ws" deploy hook can push ACME
+certificates to a TrueNAS server over its WebSocket API from OPNsense.
+
+OPNsense ships only python3; this plugin also provides a guarded
+python -> python3 shim because the upstream acme.sh truenas_ws hook invokes
+`/usr/bin/env python`.
