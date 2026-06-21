@@ -16,15 +16,20 @@
         "exc.py": "a74eb70a1a5e240a4471e3f51a0ae61bcb2c1cf0819ad5668f455da43a63c809",
         "jsonrpc.py": "6ecca47d339d4438413db09d92d7541bcf80a421ac9766a0c3ef16fa5bf2f553",
         "legacy.py": "ec597f82a7992885ffa59fb36fa72be0d71ff216e3ca099ebc83d500b6eafd63",
-        "utils.py": "23dbd3c0fc73364bca179458a12c46e1a3d49daf5484ad9b8e3c94c0ace28ee5"
-      }
+        "utils.py": "7f46d295749a7446e8263fad985818197f19c82768c8bffc5304af2e575a37a8"
+      },
+      "patches": [
+        "freebsd-platform: normalize sys.platform 'freebsd14'->'freebsd' in utils.set_socket_options (applied by scripts/vendor-update.sh)"
+      ]
     },
     "websocket": {
       "repo": "https://github.com/websocket-client/websocket-client",
       "ref": "v1.8.0",
       "subdir": "websocket",
       "license": "Apache-2.0",
-      "exclude": ["tests"],
+      "exclude": [
+        "tests"
+      ],
       "files": {
         "__init__.py": "1af5694cf923be16041997235eccd27ebb3615a547b9d51d1a0192a9ffd16f0e",
         "_abnf.py": "59eb14252486491a73b93a7455e2b5d8ee1261854c37a0b237a6ea5d2e25936c",

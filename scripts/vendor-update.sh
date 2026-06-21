@@ -77,7 +77,27 @@ for pkg, meta in lock["packages"].items():
                 continue
             if p.suffix == ".py" or p.name == "py.typed":
                 shutil.copy2(p, destdir / p.name)
-        # checksums for .py files only (the lock's contract)
+
+        # Portability patch: FreeBSD's sys.platform is version-suffixed
+        # ("freebsd14"), which upstream's exact-match platform check rejects.
+        # Normalize it so OPNsense (FreeBSD) is supported. Applied identically
+        # to the committed tree; keep this in sync with src/.../utils.py.
+        if pkg == "truenas_api_client":
+            up = destdir / "utils.py"
+            t = up.read_text()
+            anchor = "def set_socket_options(socobj):\n    plat = sys.platform\n"
+            patched = anchor + (
+                "    # os-truenas-api-client portability patch: FreeBSD reports sys.platform as\n"
+                "    # version-suffixed (\"freebsd14\"), which upstream's exact-match checks reject.\n"
+                "    # Normalize to \"freebsd\" so OPNsense (FreeBSD) takes the TCP_KEEPIDLE path.\n"
+                "    if plat.startswith('freebsd'):\n"
+                "        plat = 'freebsd'\n"
+            )
+            if "startswith('freebsd')" not in t:
+                assert anchor in t, "utils.py patch anchor not found upstream"
+                up.write_text(t.replace(anchor, patched, 1))
+
+        # checksums for .py files only (the lock's contract; post-patch)
         for p in sorted(destdir.glob("*.py")):
             files[p.name] = sha256(p)
         meta["ref"] = target_ref

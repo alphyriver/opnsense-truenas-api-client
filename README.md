@@ -53,11 +53,14 @@ midclt --uri wss://<truenas-ip>/websocket -K <api-key> call system.ready
 
 ## Provenance & updates
 
-The vendored sources are **byte-exact** copies pinned in
-[`vendor-lock.json`](vendor-lock.json) with per-file sha256 sums, matching the
-copies shipping on **TrueNAS SCALE 25.10.4**:
+The vendored sources are copies pinned in [`vendor-lock.json`](vendor-lock.json)
+with per-file sha256 sums, matching the copies shipping on **TrueNAS SCALE
+25.10.4** — verified byte-exact except for one documented portability patch:
 
 - `truenas_api_client` — [truenas/api_client](https://github.com/truenas/api_client) `release/25.10.4`
+  (one patch: normalize FreeBSD's version-suffixed `sys.platform`, e.g.
+  `freebsd14` → `freebsd`, in `utils.set_socket_options` — upstream only runs on
+  Linux and rejects FreeBSD's platform string)
 - `websocket-client` — [websocket-client](https://github.com/websocket-client/websocket-client) `v1.8.0`
 
 `scripts/vendor-update.sh` (run weekly by `.github/workflows/vendor-update.yml`)
