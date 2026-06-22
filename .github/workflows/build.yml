@@ -21,10 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
         with:
           python-version: '3.13'
 
@@ -62,15 +62,15 @@ jobs:
     needs: verify
     steps:
       - name: Checkout opnsense/plugins (build root)
-        run: git clone --depth 1 https://github.com/opnsense/plugins.git ${GITHUB_WORKSPACE}
+        run: git clone --depth 1 https://github.com/opnsense/plugins.git "${GITHUB_WORKSPACE}"
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
         with:
           path: ${{ env.PLUGIN_CATEGORY }}/${{ env.PLUGIN_NAME }}
 
       - name: Build package in FreeBSD
-        uses: vmactions/freebsd-vm@v1
+        uses: vmactions/freebsd-vm@b84ab5559b5a1bb4b8ee2737d2506a16e1737636  # v1.4.8
         with:
           envs: 'PLUGIN_NAME PLUGIN_CATEGORY'
           usesh: true
@@ -84,7 +84,7 @@ jobs:
             make package
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
           name: os-${{ env.PLUGIN_NAME }}
           path: ${{ env.PLUGIN_CATEGORY }}/${{ env.PLUGIN_NAME }}/work/pkg/*.pkg
