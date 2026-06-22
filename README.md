@@ -41,15 +41,22 @@ pkg install os-truenas-api-client
 ```
 
 Then point the `os-acme-client` TrueNAS action at `type: acme_truenas_ws`,
-hostname = the TrueNAS IP, protocol = `wss`, and a valid TrueNAS API key.
+hostname = the TrueNAS IP, protocol = `wss`, and a valid TrueNAS API key. The
+TrueNAS endpoint must present a certificate the firewall trusts — `midclt`
+always verifies TLS (see [`docs/security.md`](docs/security.md)).
 
 Verify:
 
 ```sh
 command -v midclt
 python3 -c "import truenas_api_client, websocket; print('ok')"
-midclt --uri wss://<truenas-ip>/websocket -K <api-key> call system.ready
+# Pass the API key via the environment so it is not exposed in `ps`:
+MIDCLT_API_KEY="<api-key>" midclt --uri wss://<truenas-ip>/websocket call system.ready
 ```
+
+> Credentials should be supplied via `MIDCLT_API_KEY` / `MIDCLT_PASSWORD` rather
+> than `-K`/`-P` on the command line, which are visible to local users via `ps`.
+> See [`docs/security.md`](docs/security.md).
 
 ## Provenance & updates
 
