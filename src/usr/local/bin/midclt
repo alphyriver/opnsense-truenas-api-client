@@ -1,11 +1,60 @@
 #!/usr/local/bin/python3
-# Console-script entry point for the vendored truenas_api_client package.
-# Mirrors the upstream `midclt = truenas_api_client:main` console script so the
-# os-acme-client `truenas_ws` deploy hook (which shells out to `midclt`) works
-# on OPNsense. See docs/ for provenance and pinned upstream versions.
+"""Console-script entry point for the vendored truenas_api_client package.
+
+Mirrors the upstream ``midclt = truenas_api_client:main`` console script so the
+os-acme-client ``truenas_ws`` deploy hook (which shells out to ``midclt``) works
+on OPNsense. See docs/ for provenance and pinned upstream versions.
+
+One local hardening layer is applied *before* dispatching to the unmodified
+vendored ``main()`` (the vendored package itself is left byte-for-byte upstream,
+so vendor-lock.json stays authoritative):
+
+  Credentials via environment, not argv.
+    An API key or password passed on the command line (``-K/--api-key``,
+    ``-P/--password``) is visible to any local user through ``ps`` / ``procstat``
+    — the kernel keeps the argv a process was exec'd with. Instead, read the
+    secret from ``MIDCLT_API_KEY`` / ``MIDCLT_PASSWORD`` and splice it into argv
+    *in-process*: mutating ``sys.argv`` does not rewrite the saved kernel
+    cmdline, so the secret reaches argparse without ever appearing in ``ps``.
+    This is the form the deploy hook should use. See docs/security.md.
+
+Connection trust (TLS verification on; no pickle/``py_exceptions`` over the
+network) is enforced by the vendored client's own safe defaults and its
+``uri_check`` guard — this entrypoint never weakens them.
+"""
+import os
 import sys
 
 from truenas_api_client import main
 
+
+def _inject_secret_from_env(env_name, primary_flag, *aliases):
+    """Splice a secret from the environment into argv as ``primary_flag VALUE``.
+
+    The flag is inserted *before* the sub-command (position 1) because midclt's
+    top-level options must precede ``call``/``ping``/``subscribe``. If the secret
+    is already given on the command line we leave it alone and warn that the
+    argv form is exposed in ``ps``.
+    """
+    value = os.environ.get(env_name)
+    flags = (primary_flag, *aliases)
+    on_argv = any(
+        arg == f or arg.startswith(f + "=")
+        for arg in sys.argv[1:]
+        for f in flags
+    )
+    if on_argv:
+        print(
+            f"midclt: warning: {primary_flag} on the command line is visible to "
+            f"other local users via ps; prefer the {env_name} environment variable.",
+            file=sys.stderr,
+        )
+        return
+    if value:
+        sys.argv[1:1] = [primary_flag, value]
+
+
 if __name__ == "__main__":
+    _inject_secret_from_env("MIDCLT_API_KEY", "-K", "--api-key")
+    _inject_secret_from_env("MIDCLT_PASSWORD", "-P", "--password")
     sys.exit(main())
