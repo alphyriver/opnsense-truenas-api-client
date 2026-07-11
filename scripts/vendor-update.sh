@@ -51,8 +51,10 @@ for pkg, meta in lock["packages"].items():
         series = cur_ref.rsplit(".", 1)[0] + ".*"   # release/25.10.*
         refs = ls_remote(repo, "heads", series)
         best = max(refs, key=lambda n: ver_tuple(n))
-        target_ref, target_sha, kind = best, refs[best], "heads"
-        tnac_version = best.split("/", 1)[-1]
+        prefix = cur_ref.rsplit("/", 1)[0] + "/"    # "release/"; ls_remote's
+                                                     # stripped keys drop it
+        target_ref, target_sha, kind = prefix + best, refs[best], "heads"
+        tnac_version = best
     else:                                           # websocket-client (tag vX.*)
         major = cur_ref.split(".", 1)[0] + ".*"     # v1.*
         refs = ls_remote(repo, "tags", major)
