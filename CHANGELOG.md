@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.1](https://github.com/alphyriver/opnsense-truenas-api-client/compare/v0.1.0...v0.1.1) (2026-07-11)
+
+
+### Bug Fixes
+
+* **vendor-update:** preserve release/ branch prefix when cloning target ref ([11c0d7d](https://github.com/alphyriver/opnsense-truenas-api-client/commit/11c0d7dd6ba97ce4124361dfc57f88a489a26dd9))
+* **vendor-update:** preserve release/ branch prefix when cloning target ref ([5eaa6df](https://github.com/alphyriver/opnsense-truenas-api-client/commit/5eaa6df176892ec7b32ef2414f8f181c0d840676))
+
 ## 0.1.0 (2026-06-22)
 
 
