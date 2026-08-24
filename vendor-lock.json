@@ -1,11 +1,11 @@
 {
   "_comment": "Pinned, byte-exact provenance of the vendored Python packages under src/usr/local/lib/python3.13/site-packages. Verified to match the copies shipping on TrueNAS SCALE 25.10.4. scripts/vendor-update.sh re-vendors from these refs and checks the sha256 sums.",
-  "version": "25.10.6",
+  "version": "25.10.7",
   "python_site": "usr/local/lib/python3.13/site-packages",
   "packages": {
     "truenas_api_client": {
       "repo": "https://github.com/truenas/api_client",
-      "ref": "release/25.10.6",
+      "ref": "release/25.10.7",
       "commit": "8c59978c3bf6c4e38271363907ec46e9b7f10abf",
       "subdir": "truenas_api_client",
       "license": "LGPL-3.0",
