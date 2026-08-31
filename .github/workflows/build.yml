@@ -57,9 +57,20 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y shellcheck >/dev/null
           shellcheck +POST_INSTALL +PRE_DEINSTALL scripts/*.sh || true
 
+  # Builds the package on FreeBSD once per pkg ABI the release feed publishes —
+  # 14.3 for OPNsense <=26.1, 15.1 for 26.7+ — so an ABI-specific build break is
+  # caught on the PR rather than at release time.
   build:
     runs-on: ubuntu-latest
     needs: verify
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - slug: "freebsd14-amd64"
+            freebsd: "14.3"
+          - slug: "freebsd15-amd64"
+            freebsd: "15.1"
     steps:
       - name: Checkout opnsense/plugins (build root)
         run: git clone --depth 1 https://github.com/opnsense/plugins.git "${GITHUB_WORKSPACE}"
@@ -69,12 +80,12 @@ jobs:
         with:
           path: ${{ env.PLUGIN_CATEGORY }}/${{ env.PLUGIN_NAME }}
 
-      - name: Build package in FreeBSD
+      - name: Build package in FreeBSD ${{ matrix.freebsd }}
         uses: vmactions/freebsd-vm@83b151f58c6047089f4c80eb5ba2039d158ce093  # v1.5.3
         with:
           envs: 'PLUGIN_NAME PLUGIN_CATEGORY'
           usesh: true
-          release: "14.3"
+          release: ${{ matrix.freebsd }}
           prepare: |
             mkdir -p /usr/local/etc/pkg/repos
             echo 'FreeBSD-kmods: { enabled: no }' > /usr/local/etc/pkg/repos/FreeBSD-kmods.conf
@@ -86,6 +97,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
-          name: os-${{ env.PLUGIN_NAME }}
+          name: os-${{ env.PLUGIN_NAME }}-${{ matrix.slug }}
           path: ${{ env.PLUGIN_CATEGORY }}/${{ env.PLUGIN_NAME }}/work/pkg/*.pkg
           if-no-files-found: error
