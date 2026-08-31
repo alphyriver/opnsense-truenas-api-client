@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.2](https://github.com/alphyriver/opnsense-truenas-api-client/compare/v0.1.1...v0.1.2) (2026-08-31)
+
+
+### Bug Fixes
+
+* **ci:** build and publish the package for every supported pkg ABI ([2c336e5](https://github.com/alphyriver/opnsense-truenas-api-client/commit/2c336e54b912e9086b3640fe6092dff4ee4c2b98))
+* **ci:** build and publish the package for every supported pkg ABI ([82fa90a](https://github.com/alphyriver/opnsense-truenas-api-client/commit/82fa90a44142a3cae62aed84a4f0a4592dfb76f0))
+* **ci:** parse the package ABI on the first colon only ([5f00e60](https://github.com/alphyriver/opnsense-truenas-api-client/commit/5f00e607badedf76fbad9cac8fd08df97b5e3787))
+* **ci:** parse the package ABI on the first colon only ([456357a](https://github.com/alphyriver/opnsense-truenas-api-client/commit/456357a809a105cfb2ee866e074c5b3a9af8d69c))
+* **release-please:** set group-pull-request-title-pattern to include version ([851c428](https://github.com/alphyriver/opnsense-truenas-api-client/commit/851c4289881ee6f8b93a0ea2b86266636720c38a))
+* **release-please:** set group-pull-request-title-pattern to include version ([95d5e5a](https://github.com/alphyriver/opnsense-truenas-api-client/commit/95d5e5ad6238063e549f73e2944782b0229998f9))
+
+
+### Miscellaneous Chores
+
+* release 0.1.2 ([5fa3c9f](https://github.com/alphyriver/opnsense-truenas-api-client/commit/5fa3c9f8e58bb47b7d4680a3ef4f6f0bbe1b5f4e))
+
 ## [0.1.1](https://github.com/alphyriver/opnsense-truenas-api-client/compare/v0.1.0...v0.1.1) (2026-07-11)
 
 
