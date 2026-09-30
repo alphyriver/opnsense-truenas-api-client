@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.3](https://github.com/alphyriver/opnsense-truenas-api-client/compare/v0.1.2...v0.1.3) (2026-09-30)
+
+
+### Bug Fixes
+
+* **ci:** group GITHUB_OUTPUT writes in vendor-update (SC2129) ([5e7cdf7](https://github.com/alphyriver/opnsense-truenas-api-client/commit/5e7cdf7fe6449d8d5abd4f03b7338f5aaa49fbef))
+* **ci:** stop vendor-update colliding with merged PR branches ([ed4c680](https://github.com/alphyriver/opnsense-truenas-api-client/commit/ed4c680209250fcaa74e4ca23960366a1219759f))
+* **ci:** stop vendor-update colliding with merged PR branches ([08f3d1c](https://github.com/alphyriver/opnsense-truenas-api-client/commit/08f3d1c392ed89caefb54afd653e05bb0f0c1b17))
+
 ## [0.1.2](https://github.com/alphyriver/opnsense-truenas-api-client/compare/v0.1.1...v0.1.2) (2026-08-31)
 
 
