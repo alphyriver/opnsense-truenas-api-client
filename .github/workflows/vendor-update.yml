@@ -29,8 +29,17 @@ jobs:
         run: |
           sh scripts/vendor-update.sh
           if [ -n "$(git status --porcelain)" ]; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "version=$(jq -r .version vendor-lock.json)" >> "$GITHUB_OUTPUT"
+            # lock: name the branch after the lock's content, not just the
+            # TrueNAS version: websocket-client, or a force-moved upstream
+            # release branch, can change while the version stays put, and the
+            # old vendor/tnac-<version> branch from a merged PR then rejects
+            # the push.
+            {
+              echo "changed=true"
+              echo "version=$(jq -r .version vendor-lock.json)"
+              echo "ws=$(jq -r .packages.websocket.ref vendor-lock.json)"
+              echo "lock=$(sha256sum vendor-lock.json | cut -c1-8)"
+            } >> "$GITHUB_OUTPUT"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
@@ -40,18 +49,27 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.VENDOR_UPDATE_TOKEN || github.token }}
           VER: ${{ steps.vendor.outputs.version }}
+          WS: ${{ steps.vendor.outputs.ws }}
+          LOCK: ${{ steps.vendor.outputs.lock }}
         run: |
           set -eu
-          branch="vendor/tnac-${VER}"
+          branch="vendor/tnac-${VER}-${LOCK}"
+          # Same lock content → same branch: this exact update is already
+          # proposed (PR open or awaiting review), so don't fail every week.
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            echo "::notice::$branch already exists; this update is already proposed"
+            exit 0
+          fi
+          title="chore(deps): re-vendor TrueNAS API client ${VER} (websocket-client ${WS})"
           git config user.name "vendor-bot"
           git config user.email "vendor-bot@users.noreply.github.com"
           git checkout -b "$branch"
           git add -A
-          git commit -m "chore(deps): re-vendor TrueNAS API client ${VER}"
+          git commit -m "$title"
           git push origin "$branch"
           gh pr create \
             --base main --head "$branch" \
-            --title "chore(deps): re-vendor TrueNAS API client ${VER}" \
-            --body "Automated re-vendor to TrueNAS ${VER}.
+            --title "$title" \
+            --body "Automated re-vendor to TrueNAS ${VER}, websocket-client ${WS}.
 
           Review the diff and confirm the \`vendor-lock.json\` checksums before merging. CI runs on this PR when a VENDOR_UPDATE_TOKEN PAT is configured (see workflow header)."
