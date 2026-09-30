@@ -29,14 +29,17 @@ jobs:
         run: |
           sh scripts/vendor-update.sh
           if [ -n "$(git status --porcelain)" ]; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "version=$(jq -r .version vendor-lock.json)" >> "$GITHUB_OUTPUT"
-            echo "ws=$(jq -r .packages.websocket.ref vendor-lock.json)" >> "$GITHUB_OUTPUT"
-            # Name the branch after the lock's content, not just the TrueNAS
-            # version: websocket-client, or a force-moved upstream release
-            # branch, can change while the version stays put, and the old
-            # vendor/tnac-<version> branch from a merged PR then rejects the push.
-            echo "lock=$(sha256sum vendor-lock.json | cut -c1-8)" >> "$GITHUB_OUTPUT"
+            # lock: name the branch after the lock's content, not just the
+            # TrueNAS version: websocket-client, or a force-moved upstream
+            # release branch, can change while the version stays put, and the
+            # old vendor/tnac-<version> branch from a merged PR then rejects
+            # the push.
+            {
+              echo "changed=true"
+              echo "version=$(jq -r .version vendor-lock.json)"
+              echo "ws=$(jq -r .packages.websocket.ref vendor-lock.json)"
+              echo "lock=$(sha256sum vendor-lock.json | cut -c1-8)"
+            } >> "$GITHUB_OUTPUT"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
