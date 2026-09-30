@@ -60,7 +60,9 @@ jobs:
             echo "::notice::$branch already exists; this update is already proposed"
             exit 0
           fi
-          title="chore(deps): re-vendor TrueNAS API client ${VER} (websocket-client ${WS})"
+          # fix(deps), not chore: the vendored code ships in the package, so
+          # merging this should make release-please propose a release.
+          title="fix(deps): re-vendor TrueNAS API client ${VER} (websocket-client ${WS})"
           git config user.name "vendor-bot"
           git config user.email "vendor-bot@users.noreply.github.com"
           git checkout -b "$branch"

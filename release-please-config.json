@@ -6,7 +6,6 @@
   "packages": {
     ".": {
       "release-type": "simple",
-      "package-name": "os-truenas-api-client",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "extra-files": [
