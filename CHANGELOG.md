@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.4](https://github.com/alphyriver/opnsense-truenas-api-client/compare/v0.1.3...v0.1.4) (2026-09-30)
+
+
+### Bug Fixes
+
+* **release:** let release-please tag its own merged release PRs ([c0c8b63](https://github.com/alphyriver/opnsense-truenas-api-client/commit/c0c8b63181df6e77a4cef2063a2e1e274da99828))
+* **release:** let release-please tag its own merged release PRs ([8d021e4](https://github.com/alphyriver/opnsense-truenas-api-client/commit/8d021e4ff1cafbbdc7933f23a27bee788eaf0a46))
+
 ## [0.1.3](https://github.com/alphyriver/opnsense-truenas-api-client/compare/v0.1.2...v0.1.3) (2026-09-30)
 
 
