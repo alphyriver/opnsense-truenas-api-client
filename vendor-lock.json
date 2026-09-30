@@ -6,11 +6,11 @@
     "truenas_api_client": {
       "repo": "https://github.com/truenas/api_client",
       "ref": "release/25.10.7",
-      "commit": "8c59978c3bf6c4e38271363907ec46e9b7f10abf",
+      "commit": "53663ff1f1076a6789e1e2e7c48f2a5212d88d6c",
       "subdir": "truenas_api_client",
       "license": "LGPL-3.0",
       "files": {
-        "__init__.py": "cd758299a7778543d7108de10c5c54821c4d5429e9427ad040602d8ca0aa9f8d",
+        "__init__.py": "ca74f49a16a52ead7a705388cedda5e53a4fdd977c687e41568841146cfba89b",
         "config.py": "7faec9e3eadc46bcead0e36e8bb3a52dcab90e5bef05b316e5c438517d73d985",
         "ejson.py": "e92ee0a1f5a3ea9445e8ac4b50b42f99f00dccfc09a95cd80b94caea1f25ec15",
         "exc.py": "a74eb70a1a5e240a4471e3f51a0ae61bcb2c1cf0819ad5668f455da43a63c809",
@@ -24,30 +24,30 @@
     },
     "websocket": {
       "repo": "https://github.com/websocket-client/websocket-client",
-      "ref": "v1.9.0",
+      "ref": "v1.9.2",
       "subdir": "websocket",
       "license": "Apache-2.0",
       "exclude": [
         "tests"
       ],
       "files": {
-        "__init__.py": "2370998a3790e51927e87c67c0ee9065d35e65bb981305c1381eb67bfcb9c69d",
-        "_abnf.py": "440e18a4f52a1618148d0662de71737a3418f2ab797e949108e4cd5558b8c4a2",
-        "_app.py": "a3ff4cf380c73f5e8f64f62d1e92ffcfa210f3e96931b0e39579b3a7234068fa",
-        "_cookiejar.py": "d156c66a48b69d97fea82fe2103c5afe157189dd843e6a9827770ac4f0ce591a",
-        "_core.py": "dd77678a0f3ba5adcbcffadcf4657ccc577e12844f84e8bfab7bad3667546377",
-        "_dispatcher.py": "1c733840e27db3a38ead1750c500f426e80ffc2f8ddf9d9a53023536a05c753b",
-        "_exceptions.py": "6af5b69235dedac81bcbe86c516fd0348b8c37a70cdd35dfded0669d26739e2b",
-        "_handshake.py": "592717f96c2d809048bfebf76031497625080db6926bd3dc01dd8b5e913334ae",
-        "_http.py": "689a4e94c61ccfa88f6f4dfa4dc2565830c89c539d2eb1161a41b0bf0d2ad7d4",
-        "_logging.py": "93b397367221dd475228d1dd656391e8f799de4d40653a53363832f049dcc29c",
-        "_socket.py": "9556708eba36a86c5ca039a425f71685a98b029b17caa4165fbffb0211de54a8",
-        "_ssl_compat.py": "8640bb3e243a6641fcd9ae839de3511c274aca936f4044ab21b812ee3dd1a96f",
-        "_url.py": "e1635822b5ac0d515a660827712baf055a99536111c0c5b7b73c81c8f129ec48",
-        "_utils.py": "43a127dc3ab201cb4a37903c0d96ff4ba014ade7274a31ff92a0a3dd55de7532",
-        "_wsdump.py": "9d77f6987eec5471e13425b4cf5836c3efbbfd62ec77c9270fd956372322e3ec"
+        "__init__.py": "ace447d39bec2d5152bb44301e4a5204bb1a2e62efd7db69a95856ddfef76e47",
+        "_abnf.py": "77b1007578230bf99bc82184f9e83014f852ec7b6aa3c38364668d3a4fcaa4cb",
+        "_app.py": "04b2c6d431480c6c10282db90f5f08ba6399af73155ece346cd8a1148045a1ff",
+        "_cookiejar.py": "b24fdb2640b5553373f524cfca0a7d5a280539ce322855db5c9cf3eef9cd03b7",
+        "_core.py": "3011b43e249623594045c808e7fb847aea938a910993eeea85fe7e6ac83f45de",
+        "_dispatcher.py": "2fe3bd65d76f3f282356e85924c133a5c3c27a640710a06185c9cd2fed4a5c0f",
+        "_exceptions.py": "42145294b2351dd56cd508bb73d537db5224ae3159ef3702a03d0f80dc245e82",
+        "_handshake.py": "ce39525fe9fc3fbc1dd378a23190edb63953285dd6fb408ed70a8770e31c5cbe",
+        "_http.py": "79e8ab98e09d3c1357f28d6845131ee1cb344ab5701c9925e8d2032d3fa6b2a6",
+        "_logging.py": "c213b317cbe157fe1033ca4093720547114a63b1633ce99e945aa566aeea096b",
+        "_socket.py": "0e1bf0eba2a9c26eae1ef35c3b71dd4511d0921a97047c15746405f7e150aa6a",
+        "_ssl_compat.py": "ff847c7a0af7b888339eb5794293095b7a266ef1abaaf907574a54e1daaa5ec4",
+        "_url.py": "a83b51837b751354dedd992f34770a636625a9dcfab32b192cf540d09521007c",
+        "_utils.py": "7206be963365ed5f6de02b07bee63b6050b87fa06c99095cfab3e13730a17b21",
+        "_wsdump.py": "ad665a6ccdbe39a0fbd47874b9c00ce29a25616ea9bc52a2ca0c378e2602d2fd"
       },
-      "commit": "e46a8fe2dbc74f88a2cfa749f2499f7cc6f31409"
+      "commit": "12225f5ce6e27536be3b0da85fd763ed75581bcc"
     }
   }
 }
