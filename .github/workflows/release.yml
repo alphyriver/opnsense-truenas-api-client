@@ -74,7 +74,7 @@ jobs:
           test "$BASE" = "$MK" || { echo "::error::tag v$TAG (base $BASE) != Makefile PLUGIN_VERSION $MK"; exit 1; }
 
       - name: Build package (FreeBSD ${{ matrix.freebsd }} → ${{ matrix.abi }})
-        uses: vmactions/freebsd-vm@a2f9a41fa97f6848b8c3b791087dfcdaa5b473ff  # v1.5.8
+        uses: vmactions/freebsd-vm@c46abacb49f09938ca4e1702d15d836285d694cc  # v1.5.9
         env:
           WANT_ABI: ${{ matrix.abi }}
           SLUG: ${{ matrix.slug }}
@@ -113,7 +113,7 @@ jobs:
             ls -l "$WS/dist"
 
       - name: Upload package
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: pkg-${{ matrix.slug }}
           path: dist/
@@ -146,7 +146,7 @@ jobs:
           path: site
 
       - name: Download packages
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8.0.2
         with:
           path: artifacts
           pattern: pkg-*
@@ -176,7 +176,7 @@ jobs:
           printf '%s\n' "$SIGNING_KEY" > signing.key
 
       - name: Sign every ABI catalogue (FreeBSD)
-        uses: vmactions/freebsd-vm@a2f9a41fa97f6848b8c3b791087dfcdaa5b473ff  # v1.5.8
+        uses: vmactions/freebsd-vm@c46abacb49f09938ca4e1702d15d836285d694cc  # v1.5.9
         with:
           usesh: true
           release: "15.1"
